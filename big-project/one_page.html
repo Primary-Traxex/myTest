@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>H5单页面手势滑屏切换</title>
+    <meta name="viewport" charset="utf-8" content="width=device-width,
+    initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=1.0">    
+    <!-- <link rel="stylesheet" type="text/css" href="css/bootstrap.css"> -->
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/buttons.css">
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+    <!-- <script type="text/javascript" src="js/bootstrap.min.js"></script> -->
+    <script type="text/javascript" src="js/cityselect.js"></script>
+    <script type="text/javascript" src="js/result.js"></script>
+    <script type="text/javascript" src="js/validate.js"></script>
+    <style type="text/css">
+        .error{
+            color:red;
+        }
+    </style>
+</head>
+<body>
+  <div id="viewport" class="viewport">
+    <div id="infoPage" class="pageview" style="overflow-y: scroll;background-color: #31bce7">
+      <div id="wrap">
+        <!-- Modal One -->
+        <div class="modal">
+          <input class="modal-open" id="modal-one" type="checkbox" hidden>
+          <div class="modal-wrap" aria-hidden="true" role="dialog">
+            <label class="modal-overlay" for="modal-one"></label>
+            <div class="modal-dialog">
+              <div class="modal-header">
+                <h2>温馨提示</h2>
+                <label class="btn-close" for="modal-one" aria-hidden="true">×</label>
+              </div>
+              <div class="modal-body">
+                <p>感谢您的参与<br>获赠奖品将于活动结束后一周发出</p>
+              </div>
+              <div class="modal-footer clickfooter">
+                <label for="modal-one" id="nextpage3">确定!</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p id="nextPage2">查看规则</p>
+        <h1 class="page2head">找茬有奖</h1>
+        <p style="font-family: 微软雅黑;font-size:16px;margin: 5px auto;width: 89%;color: #fff">*请找出下面图片中4个区域的5个不同之处，在对应数字区域填上你的答案即可</p>
+        <div id="image-2">
+          <img src="images/findDifOri.jpg" alt="findDifOri">
+          <img src="images/findDifChange.jpg" alt="findDifChange">
+        </div>
+        <form id="dealerSelect" action="">
+          <div class="answerNow">
+            <div >1.<input type="text" name="answer01" id="answer01"></input></div>
+            <div >2.<input type="text" name="answer02" id="answer02"></input></div>
+            <div >3.<input type="text" name="answer03" id="answer03"></input></div>
+            <div >4.<input type="text" name="answer04" id="answer04"></input></div>
+            <div >5.<input type="text" name="answer05" id="answer05"></input></div>
+          </div>
+          <!-- <textarea name="answer" id="answer" cols="30" rows="10" placeholder="【答案】请写出1、2、3、4区域的不同"></textarea>
+          <input type="text" name="customName" id="customName" placeholder="【答案】请写出1、2、3、4区域的不同">
+          <input type="text" name="phoneNum" id="phoneNum" placeholder="【答案】请写出1、2、3、4区域的不同"> -->
+          <p for="selectLocation" style="margin-left: 7%;font-family: 微软雅黑;color: #fff;font-size: 19px">收货地址<sub style="font-size: 17px;color: #000">▼</sub></p>
+          <div class="selectLocation">
+            <span>姓名:<input type="text" name="yourname" id="yourname"></input></span>
+            <span >电话:<input type="text" name="phonecall" id="phonecall"></input></span>
+            <select name="province" id="province" style="margin-top: 15px"></select>
+            <select name="city" id="city"></select>
+            <select name="county" id="county"></select>
+            <span style="display: inline-block;text-align: left;margin-top: 15px">详细地址:<textarea type="text" name="answer" id="detailAddress" class="newOne"></textarea></span>
+            <!-- <textarea name="answer" id="detailAddress" cols="30" rows="10" placeholder="详细地址（如街道、门牌号等）" style="margin-bottom: 50px"></textarea> -->
+          </div>
+          <div class="click"><input type="submit" name="click" id="upLoad" value="点击提交"></input></div>
+        </form>
+        <label id="clicklabel" class="btn" for="modal-one"></label>
+      </div>
+    </div>
+    <div class="pageview" style="background: #31bce7;overflow-y:scroll">
+        <div id="wrap2">
+          <p class="top2">&nbsp;&nbsp;&nbsp;&nbsp;"找茬"赢取大大礼包</p>
+          <div class="actRegular">活动规则</div>
+          <ul class="thin">
+            <li>1）该活动只限粉丝参与，请先关注。</li>
+            <li>2）点击菜单栏“活动专区”-《找茬有奖》，进入文章，点击下方“阅读原文”进入活动页面，找出5处不同点，并提交相关信息。</li>
+            <li>3）转发分享此活动并截图到公众号后台。</li>
+          </ul>
+          <div class="actRegular">活动须知</div>
+          <ul class="thin">
+            <li>1）每个手机号只限参与一次，先到先得。</li>
+            <li>2）前1008名参与并找对不同点的用户可获大大奖品一份，答错者名额顺延。</li>
+            <li>3）发货后不接受改地址，请务必提交前核对好资料。</li>
+            <li>4）提交资料后，请发送参与活动的手机号码到【吃货趴趴趴俱乐】公众号上，以便核对资料。</li>
+            <li>5）收货地址提交不齐全、提交资料后取消关注、没有截图并发送手机号码的用户均视为放弃此次活动参与。</li>
+            <li>6）此次活动奖品将统一于活动结束后一周内寄出，产品均统一口味，无法更换。</li>
+            <li>7）快递不送达的偏远地区将不参与此活动。</li>
+          </ul>
+          <div class="click" style="margin-bottom: 20px" id="linktoupLoad"><input type="submit" name="click" id="upLoad" value="返回"></input></div>
+          <p class="bottomMark">*最终解析权归广州淘通科技股份有限公司</p>
+        </div>
+    </div>
+    <div class="pageview page3view" style="background-color: #31bce7;">
+        <p class="page3">点击右上角<img src="images/page3/Forwardingguidelines.png" height="12px" width="13px" style="vertical-align: top;"><br><span class="lookme">转发</span>给朋友或<span class="lookme">分享</span>朋友圈<br>后截图到微信公众号哦！<br>大大礼包等你拿！</p>
+        <p class="bottomMark">*最终解析权归广州淘通科技股份有限公司</p>
+    </div>
+  </div>
+</body>
+    <script type="text/javascript">
+          $(document).ready(function () {
+              ewenx.CitySelect().init("#dealerSelect");
+              $("#dealerSelect").validate({
+              rules:{
+                  answer:{
+                      required:true,
+                      minlength:1
+                  },
+                  customName:"required",
+                  phoneNum:{
+                      number:true,
+                      required:true,
+                      minlength:11
+                  },
+                  detailAddress:"required"
+              },
+              messages:{
+                  answer:{
+                      required:"请输入一个答案",
+                      minlength:"不能为空"
+                  },
+                  customName:"请输入您的名字",
+                  phoneNum:{
+                      number:"请输入数字",
+                      required:"请输入电话号码",
+                      minlength:"请输入11位电话号码",
+                  },
+                  detailAddress:"请输入详细地址"
+              },
+              submitHandler:function(form){
+                  $("#clicklabel").click();
+              }
+          });
+          })
+    </script>
+    <script type="text/javascript" src="js/scroll.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+        var htmlHeight = $(window).height();
+        $("html").css("height",htmlHeight + "px");
+        $("body").css("height",htmlHeight + "px");
+        console.log(htmlHeight);
+        console.log($("body").height());
+      });
+    </script>
+</html>

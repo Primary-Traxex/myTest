@@ -1,0 +1,274 @@
+html,body{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+    font-family: Arial;
+    font-size: 10px;
+}
+.viewport{
+   width: 300%;
+   height: 100%;
+   display: -webkit-box;
+   overflow: hidden;
+   -webkit-transform: translate3d(0,0,0);
+   backface-visibility: hidden;
+   position: relative;
+}
+.pageview{
+    -webkit-box-flex: 1;
+    width: 0;
+    position: relative;
+}
+#infoPage img{
+  height: auto;
+  width: 90%;
+  margin:0 5% 10px 5%;
+}
+#image-2 img:first-child{
+  margin-top: 10px;
+}
+.page2head{
+  position: absolute;
+  height: 120px;
+  top: 15px;
+  left: 0px;
+  right: 0px;
+  padding-top: 6px;
+  background: url(../images/page1/PickawardIcon.png) no-repeat 50% 3px;
+  background-size: 280px;
+  color: #fff;
+  text-align: center;
+  font-family: "宋体";
+}
+.page2head h1{
+  margin: 0 auto;
+  font-size: 52px;
+}
+.page2head p{
+  font-family: 微软雅黑;
+  font-size:16px;
+  margin: 5px auto;
+  color: #fff;
+  text-align: left;
+  width: 90%;
+}
+.selectLocation{
+  width: 90%;
+  margin:7px auto;
+  text-align: center;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 5px
+}
+#province,#city,#county{
+  width: 30%;
+  margin:0 auto;
+  height: 24px;
+  padding:0;
+  text-align: center;
+  color: #000;
+  background-color: rgba(230,230,230,0.3);
+  border: none;
+}
+#image-2{
+  margin-top: 160px;
+  margin-left: 21px;
+  margin-right: 21px;
+  background-color: #04429b;
+}
+#wrap{
+  float: left;/*为了铺满全屏使用浮动*/
+  background: url(../images/page1/Decorationbubble.png) no-repeat 72% 0%,
+  url(../images/page1/BackgroundIcon.png) no-repeat 50% 14%,
+  url(../images/page1/Irregularfigurebottom.png) no-repeat 50% 100%,
+  url(../images/page1/Smallballoonbottom.png) no-repeat 50% 100%;
+  background-size: 10%,100%,100%,38%;
+  background-attachment:scroll;
+  position: relative;
+}
+.answerNow{
+  margin:15px auto;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  width: 90%;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 5px
+}
+.answerNow div{
+  margin: 0 auto;
+  width: 90%;
+  color: #fff
+}
+.answerNow div input{
+  width: 90%;
+  height: 24px;
+  border: none;
+  margin: 5px 0;
+  border-radius: 5px;
+  color: #000
+}
+.selectLocation span{
+  margin: 0 auto;
+  width: 90%;
+  color: #fff
+}
+.selectLocation span input{
+  width: 35%;
+  height: 24px;
+  border: none;
+  margin: 5px 0;
+  border-radius: 5px;
+  color: #000
+}
+.newOne{
+  display: block;
+  width: 100%;
+  height: 120px;
+  border: none;
+  margin: 5px 0;
+  border-radius: 5px;
+  color: #000;
+  line-height: 15px
+}
+.click{
+  width: 50%;
+  height: 70px;
+  margin: 15px auto 110px auto;
+  text-align: center;
+  background: url(../images/page1/Submitbutton.png) no-repeat center;
+  background-size: 100%;
+}
+#upLoad{
+  line-height: 56px; 
+  font-family: 微软雅黑;
+  font-size: 27px;
+  color: #fccc4b;
+  border:none;
+  background: none;
+}
+#wrap2{
+  width: 100%;
+  float: left;/*为了铺满全屏使用浮动*/
+  background: url(../images/page2/smallTriangleiconleft1.png) no-repeat 3% 0%,
+  url(../images/page2/smallTriangleiconleft2.png) no-repeat 3% 6%,
+  url(../images/page2/character.png) no-repeat 100% 0%,
+  url(../images/page2/Ellipsedecorationbottom.png) no-repeat 20% 5%,
+  url(../images/page2/Ellipsedecorationbottom.png) no-repeat 20% 100%;
+  background-size: 10%,10%,38%,100%,100%;
+  background-attachment:scroll,scroll,scroll,scroll;
+}
+.top2{
+  font-family: 微软雅黑;
+  font-size: 24px;
+  color: #fff;
+  padding:0;
+  margin-top: 36px;
+  margin-bottom: 20px;
+  text-align: left;
+  font-weight: bold;
+}
+.actRegular{
+  width: 90%;
+  margin:0 auto;
+  text-indent:15px;
+  font-family: 微软雅黑;
+  font-size: 20px;
+  color: #f4f8f9;
+  line-height: 45px;
+  background: url(../images/page2/Ruleiconbottom.png) no-repeat 0%;
+  background-size: 37% 100%
+}
+ul,li{
+  list-style: none;
+  color: #fff;
+  font-family: 黑体;
+  line-height: 27px;
+}
+ul{
+  padding-left: 5%;
+  padding-right: 5%;
+}
+.bottomMark{
+  text-align: center;
+  width: 80%;
+  color: #fff;
+  font-size: 8px;
+  font-family: 黑体;
+  background-color: rgba(255, 255, 255, 0.2);
+  margin:0 auto 15px auto;
+  border-radius: 5px;
+}
+.page3{
+  height: 145px;
+  padding-top: 82px;
+  padding-right: 50px;
+  background: url(../images/page3/ForwardIcon.png) no-repeat 50% 10%;
+  background-size: 290px 148px;
+  position: absolute;
+  top: 110px;
+  left: 0px;
+  right: 0px;
+  font-family: 黑体;
+  font-size: 15px;
+  color: #111010;
+  text-align: center;
+  transform:scale(1,2);
+  -ms-transform:scale(1,2);   /* IE 9 */
+  -moz-transform:scale(1,2);  /* Firefox */
+  -webkit-transform:scale(1,2); /* Safari 和 Chrome */
+  -o-transform:scale(1,2);
+  line-height: 15px;
+}
+.lookme{
+  font-size: 20px;
+  color: #fccc4b;
+}
+.page3view{
+  background:url(../images/page3/Backgrounddecoration.png) no-repeat 50% 100%;
+  background-size: 100%;
+}
+#nextPage2{ 
+  position: absolute;
+  background: url(../images/page1/RuleIcon1.png) no-repeat right top;
+  background-size: 60px;
+  box-sizing:content-box;
+  padding:8px 0px 15px 30px;
+  top: 0px;
+  z-index: 10;
+  right: 0px;
+  line-height: 15px;
+  font-size: 15px !important;
+  width: 40px;
+  height: 33px;
+  margin:0;
+  font-family: 黑体;
+  color: #f7f587;
+}
+.thin{
+  transform: scale(0.95,1);
+}
+.clickfooter{
+  margin: 0px auto;
+  text-align: center;
+  background: url(../images/page1/Submitbutton.png) no-repeat center;
+  background-size: 50%;
+  font-size: 24px;
+  color: #fccc4b;
+  font-family: 微软雅黑;
+  padding:15px 15px;
+}
+.modal-body {
+    text-align: center;
+    padding: 20px 0px;
+    font-size: 16px;
+    background: url(../images/page1/smallGiftbox.png) no-repeat 0px 20px;
+    background-size: 18%;
+    color: #000;
+}
+.weui-dialog__bd {
+    padding: 0 0.5em .8em;
+} 

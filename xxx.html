@@ -1,0 +1,107 @@
+<h1 id="概览">概览</h1>
+
+<p>本文将指引你建立一个整合了3个外部应用的简单的服务，通过HTTP和ZeroMQ来传输，通过JSON和XML来交换数据</p>
+
+<p>服务是什么？ <br> 服务是一个功能，相当于一个函数或方法，但服务运行的层次更高，函数和方法是代码层面的接口(使用APIs时一般是引入一些代码)，而服务是系统层面的（通过网络协议如HTTP访问）</p>
+
+<p>一个原子的和可重用的服务可用于构建一个在线的中间件和后端应用</p>
+
+<p>服务通过一些协议被调用或接受连接，如： plain HTTP, SOAP, JSON, AMQP, JMS WebSphere MQ, ZeroMQ, SQL, and FTP(S).</p>
+
+<p>Zato结合Redis提供了一个用于执行周期性任务的计划任务管理器</p>
+
+<p>服务在安全认证方面使用 HTTP Basic Auth, WS-Security 和 technical accounts.</p>
+
+<p>你可以通过命令行界面，API和Web admin面板来管理Zato</p><div class="se-section-delimiter"></div> <h1 id="你可以从本教程学到什么">你可以从本教程学到什么？</h1> <p>我们将完成下面几件事：</p>
+
+<ul> <li>通过HTTP协议接收JSON和XML输入</li> <li>从2个系统中调用HTTP JSON服务</li> <li>实现JSON格式基于ZeroMQ的可配置的通知机制</li> <li>从Redis中取得业务规则</li> </ul>
+
+<p>在教程结束时你能很好的了解Zato的特性，如：命令行接口，Web管理界面，热部署，统计等。</p>
+
+<p>虽然这些只是Zato中的很少一部分知识，但是会给你一个完整的概念</p><div class="se-section-delimiter"></div> <h1 id="消息流">消息流</h1> <p><img src="https://zato.io/docs/_images/service-complete.png" alt="service-complete" title=""> <br> 我们从一个最简单银行应用开始：</p>
+
+<ul> <li>一个客户端应用希望通过CUST_ID得到某个客户的更多信息 <br> <ul><li>客户的姓氏和名字</li> <li>最后一次交易时间</li> <li>最后一次的交易金额</li></ul></li> <li>客户数据存储在CRM系统中</li> <li>交易信息则保存在其它地方</li> <li>对于某些客户类型，在客户进行任何操作时都通知欺诈检测系统 </li> </ul>
+
+<p>上图中Service和Redis颜色一样，是因为他们都在Zato集群中，而其它的不属于Zato</p>
+
+<p>客户端应用(Client App)是什么我们不讨论,它可以用很多前端技术实现，本文中的客户端用Curl来模拟</p><div class="se-section-delimiter"></div> <h1 id="快速建立一个zato集群">快速建立一个Zato集群</h1> <p>开始之前，你需要安装好了Redis和PostgreSQL，这两样东西是外部组件，没有打包到Zato里面，所以你要单独安装。你也可以使用Oracle替换PostgreSQL，这里我们还是使用PostgreSQL。</p>
+
+<p>ubuntu下可以简单的使用<code>apt-get install redis-server</code>和<code>apt-get install postgresql</code>来安装</p>
+
+<ul> <li>安装好Redis和Prostgres并启动</li> <li><p>Redis不需要用户,Postgres需要用下面的命令配置一下</p> <p><code>$ sudo su - postgres # OS X users may skip it</code> <br> <code>$ createuser --no-superuser --no-createdb --no-createrole zato1</code> <br> <code>$ createdb --owner=zato1 zato1</code> <br> <code>$ psql --dbname zato1 --command="ALTER ROLE zato1 WITH PASSWORD 'zato1'"</code></p></li> </ul>
+
+<p>接下来我们快速建立一个学习用的集群,先做些准备: <br> 一个空目录(<code>$path</code>) <br> PostgreSQL的IP,端口,数据库和账号密码(<code>$odb_host, $odb_port, $odb_db_name, $odb_user and $odb_password</code>) <br> * 用于连接Redis的IP,端口,密码(<code>$kvdb_host, $kvdb_port and $kvdb_password</code>) <br> 好了,现在可以运行下面的命令,代入上面准备好的参数</p>
+
+<p>注意Redis密码默认为空 <br> <code>$ zato quickstart create $path \</code> <br> <code>postgresql $odb_host $odb_port $odb_user $odb_db_name \</code> <br> <code>$kvdb_host $kvdb_port --verbose</code> <br> 代入后运行:</p>
+
+<pre><code>$ zato quickstart create ~/tmp/qs-1/ \ postgresql localhost 5432 zato1 zato1 \ localhost 6379 --verbose ODB database password (will not be echoed): Enter the odb_password again (will not be echoed): Key/value database password (will not be echoed): Enter the kvdb_password again (will not be echoed): [1/8] Certificate authority created [2/8] ODB schema created [3/8] ODB initial data created [4/8] server1 created [5/8] server2 created [6/8] Load-balancer created Superuser created successfully. [7/8] Web admin created [8/8] Management scripts created Quickstart cluster quickstart-34657 created Web admin user:[admin], password:[esou-kozo-unda-snon] Start the cluster by issuing the /home/dsuch/tmp/qs-1/zato-qs-start.sh command Visit https://zato.io/support for more information and support options $ </code></pre>
+
+<p>注意到<code>Web admin user:[admin], password:[esou-kozo-unda-snon]</code>没,这个账号密码用于登录刚建立的web admin系统，密码是个随机的密码，你可以用<a href="https://zato.io/docs/admin/cli/update-password.html">zato update password</a>命令修改</p>
+
+<p>看看我们用<code>zato quickstart create</code>生成了哪些东西:</p>
+
+<ul> <li>一个身份认证系统</li> <li>2个服务器</li> <li>在服务器前面有个HA负载均衡</li> <li>一个web admin面板和一个admin账号</li> <li>ODB结构放在Postgres和Redis中</li> <li>一些用于启动或停止环境的脚本</li> </ul>
+
+<p>到这里,我们通过命令搭建了一个完整的环境</p>
+
+<p>后面我们会使用的一些重要TCP端口如下:</p>
+
+<table> <thead> <tr> <th style="text-align:left;">Port</th> <th>说明</th> </tr> </thead> <tbody><tr> <td style="text-align:left;">11223</td> <td>负载均衡使用的HTTP端口(外面应用通过它调用你开发的服务)</td> </tr> <tr> <td style="text-align:left;">17010</td> <td>server1的HTTP端口</td> </tr> <tr> <td style="text-align:left;">17011</td> <td>server2的HTTP端口</td> </tr> <tr> <td style="text-align:left;">8183</td> <td>web admin的HTTP端口(在浏览器中用admin用户登录)</td> </tr> </tbody></table>
+
+<p><img src="https://zato.io/docs/_images/quickstart-ports.png" alt="quickstart-ports" title=""> <br> 负载均衡和servers可以运行在不同的主机上,本教程中把这些都放在了本机中.</p>
+
+<p>虽然这只是个教程,但真实环境中同样可以这样做,到时只将’server1’需更名为’dev1’,然后手动增加和配置更多的’server’</p><div class="se-section-delimiter"></div> <h1 id="通过curl调用服务">通过CUrl调用服务</h1> <p>此刻,你需要确认Redis和PostgreSQL都正常并且允许Zato连接,你能通过下面的命令检测:</p>
+
+<pre><code>$ zato check-config /path/to/server1 SQL ODB connection OK Redis connection OK $ </code></pre>
+
+<p>如果你的输出和上面不一样,则下面的<code>./zato-qs-start.sh</code>会失败,所以请务必确认一下.</p>
+
+<p>好了,我们运行<code>zato-qs-start.sh</code>把Zato跑起来:</p>
+
+<pre><code>$ ./zato-qs-start.sh Starting the Zato quickstart environment Running sanity checks [1/6] Redis connection OK [2/6] SQL ODB connection OK [3/6] Load-balancer started [4/6] server1 started [5/6] server2 started [6/6] Web admin started Zato quickstart environment started Visit https://zato.io/support for more information and support options $ </code></pre>
+
+<p>Zato内置了一些有用的功能,其中一个是<code>zato.ping</code>,它会在Zato启动时自动加载,你可以使用Curl访问它(下面的输出稍微格式化了下)</p>
+
+<pre><code>$ curl localhost:11223/zato/ping -d '{}' {"zato_env": {"details": "", "result": "ZATO_OK", "cid": "K215495307960446051245422023713428938487"}, "zato_ping_response": {"pong": "zato"}} $ </code></pre>
+
+<p><code>zato.ping</code>的响应是JSON格式.</p>
+
+<ul> <li>我们能看到没有错误发生 (ZATO_OK)</li> <li>cid作为一个标识能够协调跨多个系统的服务</li> </ul>
+
+<h1 id="热部署你的第一个服务">热部署你的第一个服务</h1>
+
+<p>开启你最爱的IDE来建立我们的第一个Zato服务 <br> 保存下面的代码到my_service.py文件 </p>
+
+<pre><code>from zato.server.service import Service class GetClientDetails(Service): def handle(self): self.log_input() </code></pre>
+
+<ul> <li>每个服务都是<code>zato.server.service.Service</code>的子类</li> <li><code>handle(self)</code>是服务需要实现的唯一的方法,是服务的核心</li> <li><code>log_input</code>是服务可以访问的一个helper方法,你能想像,log_input会输出所有的输入数据到server日志中</li> </ul>
+
+<p>代码保存好了,我们现在就可以热部署它.</p>
+
+<p>说到这里,我们有几种方法使代码生效,热部署是其中一种</p>
+
+<p>通过命令行或web admin面板,你将一个服务推送到集群中一个服务器,Zato将自动复制该服务到所有节点,不需要任何重启,更新一个服务也是一样.</p>
+
+<p>要从命令行热部署一个服务你需要拷贝Python模块到pick-up目录</p>
+
+<p>本教程中你可以在<code>$path/server1/pickup-dir</code>和<code>$path/server2/pickup-dir</code>中任选一个,都不会有问题,另一个目录会自动同步</p>
+
+<p>好了,选择一个目录拷贝模块:</p>
+
+<pre><code>$ cp my_service.py $path/server1/pickup-dir </code></pre>
+
+<p>现在,每个server的日志文件中(<code>./logs/server.log</code>)会出现下面的内容</p>
+
+<pre><code>INFO - zato.hot-deploy.create:33 - Uploaded package id:[1], payload_name:[my_service.py] </code></pre>
+
+<p>一个服务可以在多个独立的通道,不同的安全配置,传输协议,数据格式下被使用,所以你需要明确的告诉Zato外部程序怎样调用服务,我们用浏览器打开<a href="http://localhost:8183/">http://localhost:8183/</a>在web admin中进行配置</p>
+
+<p>还记得前面生成的admin账号的密码吗?不记得了可以参考<a href="https://zato.io/docs/admin/cli/update-password.html">https://zato.io/docs/admin/cli/update-password.html</a>重置密码 <br> <img src="https://zato.io/docs/_images/web-admin-login.png" alt="web-admin-login" title=""> <br> 在主菜单点击<code>Services</code>,选择建立的集群,输入<code>get-client</code>搜索服务,如下图: <br> <img src="https://zato.io/docs/_images/web-admin-search.png" alt="web-admin-search" title=""> <br> 虽然不能在外部访问,但已经可以证实我们部署的服务已经存在</p><div class="se-section-delimiter"></div> <h1 id="通过http暴露一个服务并调用">通过HTTP暴露一个服务并调用</h1> <p>在web admin中,转到Connections -> Channels -> Plain HTTP,如下图 <br> <img src="https://zato.io/docs/_images/web-admin-channels.png" alt="web-admin-channels" title=""> <br> <img src="https://zato.io/docs/_images/web-admin-channels-new.png" alt="web-admin-channels-new" title=""> <br> 所有字段都应该是自解释的,在<a href="https://zato.io/docs/web-admin/intro.html">web admin手册</a>中有详细介绍,强调服务命名的重要性是为了解耦一个服务可能对应多个通道的问题 <br> <img src="https://zato.io/docs/_images/web-admin-channels-new-success.png" alt="web-admin-channels-new-success" title=""> <br> 至此,通道已经建立,所有server都自动更新了它们的HTTP配置,我们可以用Curl来测试一下</p>
+
+<pre><code>$ curl localhost:11223/tutorial/first-service -d '{}' $ </code></pre>
+
+<p>这里没有任何输出,是因为我们的服务返回的None,输入数据被记录到某一个server的日志中了,我们可以用grep命令查找确认一下 <br> 日志中我们可以看到</p>
+
+<pre><code>INFO - {u'impl_name': u'my_service.GetClientDetails', u'name': u'my-service.get-client-details', u'cid': u'K226134078656111264088116403218497665719', u'invocation_time': datetime.datetime(2013, 5, 14, 7, 39, 47, 417059), u'job_type': None, u'data_format': u'json', u'slow_threshold': 99999, u'request.payload': '', u'wsgi_environ': {'SERVER_PROTOCOL': 'HTTP/1.1', 'SERVER_SOFTWARE': 'gunicorn/0.16.1', 'SCRIPT_NAME': '', 'wsgi.input': <gunicorn.http.body.Body object at 0x4396a50>, 'REQUEST_METHOD': 'GET', 'HTTP_HOST': 'localhost:11223', 'PATH_INFO': '/tutorial/first-service', 'wsgi.multithread': False, 'QUERY_STRING': '', 'HTTP_CONNECTION': 'close', 'HTTP_ACCEPT': '/', 'HTTP_USER_AGENT': 'curl/7.22.0', 'wsgi.version': (1, 0), 'REMOTE_PORT': '42325', 'RAW_URI': '/tutorial/first-service', 'REMOTE_ADDR': '127.0.0.1', 'wsgi.run_once': False, 'wsgi.errors': <open file '<stderr>', mode 'w' at 0x7f34db2fe270>, 'wsgi.multiprocess': False, 'wsgi.url_scheme': 'http', 'gunicorn.socket': <socket at 0x42e9290 fileno=25 sock=127.0.0.1:17011 peer=127.0.0.1:42325>, 'SERVER_NAME': 'localhost', 'SERVER_PORT': '11223', u'zato.http.response.headers': {u'X-Zato-CID': u'K226134078656111264088116403218497665719'}, 'wsgi.file_wrapper': <class gunicorn.http.wsgi.FileWrapper at 0x202e390>}, u'environ': {}, u'user_msg': u'', u'usage': 27, u'channel': u'http-soap'} </code></pre>
+
+<p>这就是第一部分.你建立了一个集群,一个服务,在热部署该服务后调用成功,以这一部分为基础,下一部分我们把焦点放在业务功能上.</p>
